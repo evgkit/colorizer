@@ -1,9 +1,13 @@
 package com.evgkit.colorizer;
 
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -11,7 +15,11 @@ import com.evgkit.colorizer.R;
 
 public class MainActivity extends AppCompatActivity {
     ImageView imageView;
-    int[] imageResIds = {R.drawable.cuba1, R.drawable.cuba2, R.drawable.cuba3};
+    int[] imageResIds = {
+        R.drawable.cuba1,
+        R.drawable.cuba2,
+        R.drawable.cuba3
+    };
     int imageIndex = 0;
     boolean color = true;
     boolean red = true;
@@ -30,6 +38,15 @@ public class MainActivity extends AppCompatActivity {
         Glide.with(this).load(imageResIds[imageIndex]).into(imageView);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.add("Next image");
+        menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menuItem.setIcon(R.drawable.ic_add_a_photo_black_24dp);
+        menuItem.getIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        return true;
+    }
+
     private void updateSaturation() {
         ColorMatrix colorMatrix = new ColorMatrix();
         if (color) {
@@ -45,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
     private void updateColors() {
         ColorMatrix colorMatrix = new ColorMatrix();
         float[] matrix = {
-                1, 0, 0, 0, 0,
-                0, 1, 0, 0, 0,
-                0, 0, 1, 0, 0,
-                0, 0, 0, 1, 0,
+            1, 0, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 1, 0,
         };
         if (!red) matrix[0] = 0;
         if (!green) matrix[6] = 0;
