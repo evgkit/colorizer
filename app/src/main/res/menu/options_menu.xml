@@ -3,6 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/downloadImage"
+        android:icon="@android:drawable/stat_sys_download"
+        android:title="Download Image"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/nextImage"
         android:icon="@drawable/ic_add_a_photo_black_24dp"
         android:title="Next Image"

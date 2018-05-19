@@ -6,13 +6,16 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
     ImageView imageView;
     int[] imageResIds = {
         R.drawable.cuba1,
@@ -63,6 +66,17 @@ public class MainActivity extends AppCompatActivity {
                 loadImage();
                 break;
 
+            case R.id.downloadImage:
+
+                Toast.makeText(MainActivity.this, "Downloading...", Toast.LENGTH_SHORT).show();
+                (new Thread((new Runnable() {
+                    @Override
+                    public void run() {
+                        downloadItem();
+                    }
+                }), "Download Thread")).start();
+                break;
+
             case R.id.color:
                 color = !color;
                 updateSaturation();
@@ -94,6 +108,15 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void downloadItem() {
+        try {
+            Log.i(TAG, "Download Item start");
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateSaturation() {
