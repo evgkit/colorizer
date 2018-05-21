@@ -4,15 +4,17 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -28,12 +30,18 @@ public class MainActivity extends AppCompatActivity {
     boolean green = true;
     boolean blue = true;
 
+    DownloadThread downloadThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         imageView = (ImageView)findViewById(R.id.imageView);
         loadImage();
+
+        downloadThread = new DownloadThread();
+        downloadThread.setName("Download Thread");
+        downloadThread.start();
     }
 
     private void loadImage() {
@@ -69,9 +77,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.downloadImage:
                 Toast.makeText(MainActivity.this, "Downloading...", Toast.LENGTH_SHORT).show();
 
-                Thread downloadThread = new DownloadThread();
-                downloadThread.setName("Download Thread");
-                downloadThread.start();
+                for (String name : Arrays.asList("One", "Two", "Three")) {
+                    Message message = Message.obtain();
+                    message.obj = name;
+                    downloadThread.downloadHandler.sendMessage(message);
+                }
+
                 break;
 
             case R.id.color:
