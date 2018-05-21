@@ -67,14 +67,11 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.downloadImage:
-
                 Toast.makeText(MainActivity.this, "Downloading...", Toast.LENGTH_SHORT).show();
-                (new Thread((new Runnable() {
-                    @Override
-                    public void run() {
-                        downloadItem();
-                    }
-                }), "Download Thread")).start();
+
+                Thread downloadThread = new DownloadThread();
+                downloadThread.setName("Download Thread");
+                downloadThread.start();
                 break;
 
             case R.id.color:
@@ -108,15 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void downloadItem() {
-        try {
-            Log.i(TAG, "Download Item start");
-            Thread.sleep(5 * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateSaturation() {
