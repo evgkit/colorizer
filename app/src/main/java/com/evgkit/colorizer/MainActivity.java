@@ -1,5 +1,6 @@
 package com.evgkit.colorizer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String KEY_ITEM = "item";
     ImageView imageView;
     int[] imageResIds = {
         R.drawable.cuba1,
@@ -30,18 +32,12 @@ public class MainActivity extends AppCompatActivity {
     boolean green = true;
     boolean blue = true;
 
-    DownloadThread downloadThread;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         imageView = (ImageView)findViewById(R.id.imageView);
         loadImage();
-
-        downloadThread = new DownloadThread();
-        downloadThread.setName("Download Thread");
-        downloadThread.start();
     }
 
     private void loadImage() {
@@ -78,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Downloading...", Toast.LENGTH_SHORT).show();
 
                 for (String name : Arrays.asList("One", "Two", "Three")) {
-                    Message message = Message.obtain();
-                    message.obj = name;
-                    downloadThread.downloadHandler.sendMessage(message);
+                    Intent intent = new Intent(this, DownloadService.class);
+                    intent.putExtra(KEY_ITEM, name);
+                    startService(intent);
                 }
 
                 break;
@@ -115,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 invalidateOptionsMenu();
                 break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
