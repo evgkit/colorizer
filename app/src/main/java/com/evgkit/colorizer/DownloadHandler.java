@@ -6,10 +6,12 @@ import android.util.Log;
 
 public class DownloadHandler extends Handler {
     private static final String TAG = DownloadHandler.class.getSimpleName();
+    private DownloadService service;
 
     @Override
     public void handleMessage(Message msg) {
         downloadItem(msg.obj.toString());
+        service.stopSelf(msg.arg1);
     }
 
     private void downloadItem(String name) {
@@ -20,5 +22,9 @@ public class DownloadHandler extends Handler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setService(DownloadService service) {
+        this.service = service;
     }
 }

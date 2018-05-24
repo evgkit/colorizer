@@ -20,6 +20,7 @@ public class DownloadService extends Service {
             // waiting...
         }
         downloadHandler = downloadThread.downloadHandler;
+        downloadHandler.setService(this);
     }
 
     @Override
@@ -28,6 +29,7 @@ public class DownloadService extends Service {
 
         Message message = Message.obtain();
         message.obj = item;
+        message.arg1 = startId;
         downloadHandler.sendMessage(message);
 
         return Service.START_REDELIVER_INTENT;
