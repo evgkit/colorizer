@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Downloading...", Toast.LENGTH_SHORT).show();
 
                 for (String name : Arrays.asList("One", "Two", "Three")) {
-                    Intent intent = new Intent(this, DownloadService.class);
+                    Intent intent = new Intent(this, DownloadIntentService.class);
                     intent.putExtra(KEY_ITEM, name);
                     startService(intent);
                 }
