@@ -108,12 +108,12 @@ public class MainActivity extends AppCompatActivity {
                 if (isBound) {
                     if (playerService.isPlaying()) {
                         playerService.pause();
-                        item.setIcon(R.drawable.ic_media_pause);
+                        item.setIcon(R.drawable.ic_media_play);
                     } else {
                         Intent intent = new Intent(MainActivity.this, PlayerService.class);
                         startService(intent);
                         playerService.play();
-                        item.setIcon(R.drawable.ic_media_play);
+                        item.setIcon(R.drawable.ic_media_pause);
                     }
                 }
                 break;
