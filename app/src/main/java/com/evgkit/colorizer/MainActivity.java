@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -22,27 +23,25 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     public static final String KEY_ITEM = "item";
 
-    ImageView imageView;
+    private ImageView imageView;
+    private Menu menu;
 
-    int[] imageResIds = {
-        R.drawable.cuba1,
-        R.drawable.cuba2,
-        R.drawable.cuba3
-    };
-    int imageIndex = 0;
-    boolean color = true;
-    boolean red = true;
-    boolean green = true;
-    boolean blue = true;
-
+    private PlayerService playerService;
     private boolean isBound = false;
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             isBound = true;
+            PlayerService.PlayerServiceBinder binder = (PlayerService.PlayerServiceBinder) iBinder;
+            playerService = binder.getService();
+
+            if (playerService.isPlaying()) {
+                MenuItem playMenuItem = menu.findItem(R.id.playerImage);
+                playMenuItem.setIcon(R.drawable.ic_media_pause);
+            }
         }
 
         @Override
@@ -76,20 +75,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadImage() {
-        Glide.with(this).load(imageResIds[imageIndex]).into(imageView);
+        Glide.with(this).load(
+                ColorHelper.imageResIds[ColorHelper.imageIndex]
+        ).into(imageView);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
-        (menu.findItem(R.id.nextImage).getIcon())
-                .setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        (menu.findItem(R.id.nextImage).getIcon()).setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
 
-        menu.findItem(R.id.red).setChecked(red);
-        menu.findItem(R.id.green).setChecked(green);
-        menu.findItem(R.id.blue).setChecked(blue);
+        menu.findItem(R.id.red).setChecked(ColorHelper.red);
+        menu.findItem(R.id.green).setChecked(ColorHelper.green);
+        menu.findItem(R.id.blue).setChecked(ColorHelper.blue);
 
-        menu.setGroupVisible(R.id.colorGroup, color);
+        menu.setGroupVisible(R.id.colorGroup, ColorHelper.color);
+
+        this.menu = menu;
 
         return true;
     }
@@ -98,15 +100,22 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nextImage:
-                imageIndex++;
-                if (imageIndex >= imageResIds.length) {
-                    imageIndex = 0;
-                }
+                ColorHelper.nextImage();
                 loadImage();
                 break;
 
             case R.id.playerImage:
-
+                if (isBound) {
+                    if (playerService.isPlaying()) {
+                        playerService.pause();
+                        item.setIcon(R.drawable.ic_media_pause);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, PlayerService.class);
+                        startService(intent);
+                        playerService.play();
+                        item.setIcon(R.drawable.ic_media_play);
+                    }
+                }
                 break;
 
             case R.id.downloadImage:
@@ -121,64 +130,36 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.color:
-                color = !color;
-                updateSaturation();
+                ColorHelper.color = !ColorHelper.color;
+                imageView.setColorFilter(ColorHelper.getSaturation());
                 invalidateOptionsMenu();
                 break;
 
             case R.id.red:
-                red = !red;
-                updateColors();
-                item.setChecked(red);
+                ColorHelper.red = !ColorHelper.red;
+                imageView.setColorFilter(ColorHelper.getColors());
+                item.setChecked(ColorHelper.red);
                 break;
 
             case R.id.green:
-                green = !green;
-                updateColors();
-                item.setChecked(green);
+                ColorHelper.green = !ColorHelper.green;
+                imageView.setColorFilter(ColorHelper.getColors());
+                item.setChecked(ColorHelper.green);
                 break;
 
             case R.id.blue:
-                blue = !blue;
-                updateColors();
-                item.setChecked(blue);
+                ColorHelper.blue = !ColorHelper.blue;
+                imageView.setColorFilter(ColorHelper.getColors());
+                item.setChecked(ColorHelper.blue);
                 break;
 
             case R.id.reset:
-                red = green = blue = color = true;
+                ColorHelper.red = ColorHelper.green = ColorHelper.blue = ColorHelper.color = true;
                 imageView.clearColorFilter();
                 invalidateOptionsMenu();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void updateSaturation() {
-        ColorMatrix colorMatrix = new ColorMatrix();
-        if (color) {
-            red = green = blue = true;
-            colorMatrix.setSaturation(1);
-        } else {
-            colorMatrix.setSaturation(0);
-        }
-        ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
-        imageView.setColorFilter(colorFilter);
-    }
-
-    private void updateColors() {
-        ColorMatrix colorMatrix = new ColorMatrix();
-        float[] matrix = {
-            1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0,
-            0, 0, 0, 1, 0,
-        };
-        if (!red) matrix[0] = 0;
-        if (!green) matrix[6] = 0;
-        if (!blue) matrix[12] = 0;
-        colorMatrix.set(matrix);
-        ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
-        imageView.setColorFilter(colorFilter);
     }
 }
